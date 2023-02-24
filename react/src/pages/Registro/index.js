@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image } from 'react-native';
-import { TextInput, HelperText, DefaultTheme } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import globalStyles from '../../globalStyles';
 import style from '../Registro/style'
 import Logo from '../../img/logo.png';
+import { createUsuario } from '../../services/api';
 
 const validarEmail = (email) => {
 	var re = /\S+@\S+\.\S+/;
@@ -22,21 +23,36 @@ const Registro = (props) => {
 		setErrors(prevState => ({ ...prevState, [input]: error }));
 	};
 
-	const handleConfirm = () => {
+	const handleConfirm = async() => {
 		let isValid = true;
 	
+		if (validarEmail(email) === false) {
+			handleError("Email inválido", "email");
+			isValid = false;
+		}
+
 		if (senha.length < 6) {
 			handleError("Senha invalida, digite uma senha com no minímo 6 caracteres", "senha");
 		  	isValid = false;
 		}
 	
 		if (senha != senhaConfirma) {
-		  	handleError("Senhas não coincidem, digite novamente", "senhaConfirmed");
+		  	handleError("Senhas não coincidem, digite novamente", "senhaConfirma");
 		  	isValid = false;
 		}
 	
 		if (isValid) {
-			Alert.alert('valido')
+			try {
+				await createUsuario(email, senha);
+				Alert.alert('Usuário cadastrado com sucesso!');
+				props.navigation.navigate('Login');
+			} catch (error) {
+				if (error.message === "Request failed with status code 400") {
+					handleError('Email já cadastrado', 'email');
+				} else {
+					Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+				}
+			}
 		}
 	}
 
@@ -54,7 +70,7 @@ const Registro = (props) => {
 						label="Email"
 						error={errors.email !== null ? true : false}
 						onFocus={() => handleError(null, 'email')}
-						theme={{colors: { placeholder: 'white', text: 'white', primary: 'white', surface: 'yellow'}}}
+						theme={{colors: { placeholder: 'white', text: 'white', primary: 'white', error: '#ffff00'}}}
 						left={<TextInput.Icon color="white" style={{ marginTop: '50%' }} name="email" />}
 						value={email}
 						onChangeText={(email) => setEmail(email)}
@@ -66,7 +82,7 @@ const Registro = (props) => {
 						style={style.inputC}
 						mode='outlined'
 						activeOutlineColor='#fff'
-						theme={{ colors: { placeholder: '#fff', text: 'white', primary: 'white' } }}
+						theme={{ colors: { placeholder: '#fff', text: 'white', primary: 'white', error: '#ffff00' } }}
 						label="Senha"
 						error={errors.senha !== null ? true : false}
 						onFocus={() => handleError(null, 'senha')}
@@ -83,7 +99,7 @@ const Registro = (props) => {
 						style={style.inputC}
 						mode='outlined'
 						activeOutlineColor='#fff'
-						theme={{ colors: { placeholder: '#fff', text: 'white', primary: 'white' } }}
+						theme={{ colors: { placeholder: '#fff', text: 'white', primary: 'white', error: '#ffff00' } }}
 						label="Confirmar Senha"
 						error={errors.senhaConfirma !== null ? true : false}
 						onFocus={() => handleError(null, 'senhaConfirmed')}

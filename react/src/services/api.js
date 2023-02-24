@@ -15,8 +15,8 @@ export const getUsuarios = async () => {
     return api.get('/usuario');
 };
 
-export const createUsuario = async (email, nome, senha, contato, cpf, tipo) => {
-    return api.post('/usuario', { email, nome, senha, contato, cpf, tipo });
+export const createUsuario = async (email, senha) => {
+    return api.post('/usuario', { email, senha });
 };
 
 export const updateUsuarioPassword = async (senhaAntiga, senhaNova, usuarioID) => {
