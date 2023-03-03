@@ -1,17 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image } from 'react-native'
 import { TextInput } from "react-native-paper";
 import { connect } from 'react-redux';
-import { login } from '../../contexts/auth';
 import globalStyles from '../../globalStyles';
 import { usuarioLogado } from '../../store/actions/usuario';
 import style from '../Login/style'
 import Logo from '../../img/logo.png';
+import { Context } from '../../contexts/auth';
 
 const Login = (props) => {
 	const [senha, setSenha] = useState('');
 	const [hidePass, setHidePass] = useState(true);
 	const [email, setEmail] = useState('');
+
+	const { login, loadUser } = useContext(Context);
+
+	useEffect(() => {
+		loadUser().then((resolve) => {
+			const data = resolve.dataUsuario;
+		  	if (resolve.authenticated) {
+				props.onLogin(data);
+				props.navigation.navigate('Home');
+		  	}
+		});
+	}, []);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -24,7 +36,7 @@ const Login = (props) => {
 		 	const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
-				Alert.alert('Logado');
+				props.navigation.navigate('Home');
 		  	}
 		});
 	}

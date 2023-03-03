@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: 'http://192.168.0.105:5000'
+    baseURL: 'https://api-privacy-chat.vercel.app'
 });
 
 //Rota de sessão
@@ -20,7 +20,7 @@ export const createUsuario = async (email, senha) => {
 };
 
 export const updateUsuarioPassword = async (senhaAntiga, senhaNova, usuarioID) => {
-    return api.put(`/usuario_password/${usuarioID}`, { senhaAntiga, senhaNova });
+    return api.post(`/usuario_password/${usuarioID}`, { senhaAntiga, senhaNova });
 };
 
 export const deleteUsuario = async (usuarioID) => {
