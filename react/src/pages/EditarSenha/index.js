@@ -42,7 +42,7 @@ const EditarSenha = (props) => {
         try {
             await updateUsuarioPassword(senhaAntiga, senha, props.usuario.state.id);
             Alert.alert('Senha alterada com sucesso!');
-            props.navigation.navigate('Home');
+            props.navigation.navigate('HomeNav', { screen: 'Home' });
         } catch (error) {
             if (error.message === "Request failed with status code 401") {
                 handleError('Senha antiga incorreta', 'senhaAntiga');

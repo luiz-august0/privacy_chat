@@ -39,15 +39,6 @@ const login = (dispatch) => {
     }
 };
 
-const logout = (dispatch) => {
-    return async () => {
-        await AsyncStorage.removeItem("usuario");
-        await AsyncStorage.removeItem("token");
-        
-        api.defaults.headers.Authorization = null;
-    }
-};
-
 const loadUser = (dispatch) => {
     return async () => {
         const usuario = await AsyncStorage.getItem("usuario");
@@ -80,6 +71,6 @@ const loadUser = (dispatch) => {
 
 export const { Context, AuthProvider } = createContext(
     reducer,
-    { login, logout, loadUser },
+    { login, loadUser },
     initialState,
 );

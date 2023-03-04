@@ -20,7 +20,7 @@ const Login = (props) => {
 			const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
-				props.navigation.navigate('Home');
+				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
 		});
 	}, []);
@@ -36,7 +36,7 @@ const Login = (props) => {
 		 	const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
-				props.navigation.navigate('Home');
+				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
 		});
 	}
