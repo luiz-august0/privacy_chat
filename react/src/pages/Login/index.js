@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image } from 'react-native'
+import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image, ActivityIndicator, Dimensions } from 'react-native'
 import { TextInput } from "react-native-paper";
 import { connect } from 'react-redux';
 import globalStyles from '../../globalStyles';
@@ -12,16 +12,19 @@ const Login = (props) => {
 	const [senha, setSenha] = useState('');
 	const [hidePass, setHidePass] = useState(true);
 	const [email, setEmail] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 
 	const { login, loadUser } = useContext(Context);
 
 	useEffect(() => {
 		loadUser().then((resolve) => {
+			setIsLoading(true);
 			const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
 				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
+			setIsLoading(false);
 		});
 	}, []);
 
@@ -33,17 +36,20 @@ const Login = (props) => {
 		}
 	
 		login(email, senha).then((resolve) => {
+			setIsLoading(true);
 		 	const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
 				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
+			setIsLoading(false);
 		});
 	}
 
 	return (
 		<ScrollView style={{ backgroundColor: globalStyles.main_color }}>
-      		<View style={style.container}>
+			{!isLoading?
+			<View style={style.container}>
 				<SafeAreaView style={style.safeAreaL} >
 					<Image source={Logo} style={style.LogoImage}></Image>
 					<TextInput
@@ -88,7 +94,8 @@ const Login = (props) => {
 						<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Cadastrar agora</Text>
 					</TouchableOpacity>
 				</SafeAreaView>
-      		</View>
+			</View>
+			:<ActivityIndicator color="white" style={{marginTop: Dimensions.get('window').height / 2}}/>}
     	</ScrollView>
 	)
 }
