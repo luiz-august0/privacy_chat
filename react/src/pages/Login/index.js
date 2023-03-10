@@ -17,15 +17,15 @@ const Login = (props) => {
 	const { login, loadUser } = useContext(Context);
 
 	useEffect(() => {
+		setIsLoading(true);
 		loadUser().then((resolve) => {
-			setIsLoading(true);
 			const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
 				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
-			setIsLoading(false);
 		});
+		setIsLoading(false);
 	}, []);
 
 	const handleSubmit = (e) => {
@@ -35,15 +35,15 @@ const Login = (props) => {
 		  	return;
 		}
 	
+		setIsLoading(true);
 		login(email, senha).then((resolve) => {
-			setIsLoading(true);
 		 	const data = resolve.dataUsuario;
 		  	if (resolve.authenticated) {
 				props.onLogin(data);
 				props.navigation.navigate('HomeNav', { screen: 'Home' });
 		  	}
-			setIsLoading(false);
 		});
+		setIsLoading(false);
 	}
 
 	return (

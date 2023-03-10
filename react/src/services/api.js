@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: 'https://api-privacy-chat.vercel.app'
+    baseURL: 'http://10.47.3.114:5000'
 });
 
 //Rota de sessão
@@ -29,4 +29,33 @@ export const deleteUsuario = async (usuarioID) => {
 
 export const getUsuario = async (usuarioID) => {
     return api.get(`/usuario/${usuarioID}`);
+};
+
+//Rotas de usuario contato
+export const getUsuarioSolicitacoes = async (usuarioID) => { 
+    return api.get(`/usuario_solicitacao/${usuarioID}`);
+};
+
+export const getUsuarioSolicitacoesEnviadas = async (usuarioID) => { 
+    return api.get(`/usuario_solicitacao_enviadas/${usuarioID}`);
+};
+
+export const postUsuarioSolicitacao = async (usuarioSolicitado, usuarioSolicitacao) => { 
+    return api.post('/usuario_solicitacao', { usuarioSolicitado,  usuarioSolicitacao });
+};
+
+export const deleteUsuarioSolicitacao = async (usuarioSolicitado, usuarioSolicitacao) => { 
+    return api.post('/usuario_solicitacao_remove', { usuarioSolicitado,  usuarioSolicitacao });
+};
+
+export const getUsuarioContato = async (usuarioID) => { 
+    return api.get(`/usuario_contato/${usuarioID}`);
+};
+
+export const postUsuarioContato = async (usuarioID, contato, contatoApelido) => { 
+    return api.post('/usuario_contato', { usuarioID, contato, contatoApelido });
+};
+
+export const deleteUsuarioContato = async (usuarioID, contato, contatoApelido) => { 
+    return api.post('/usuario_contato_remove', { usuarioID, contato, contatoApelido });
 };

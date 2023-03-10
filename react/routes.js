@@ -12,6 +12,7 @@ import Home from './src/pages/Home/index';
 import EditarSenha from './src/pages/EditarSenha/index';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import FIcon from 'react-native-vector-icons/FontAwesome';
+import UsuarioSolicitacoes from './src/pages/UsuarioSolicitacoes';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -63,7 +64,7 @@ const HomeNav = () => {
                         ),
                         headerTitle: ""
                     }
-                }/>
+            }/>
             <Drawer.Screen name="EditarSenha" component={EditarSenha} 
                 options={
                     {
@@ -73,7 +74,17 @@ const HomeNav = () => {
                         ),
                         headerTitle: ""
                     }
-                }/>
+            }/>
+            <Drawer.Screen name="UsuarioSolicitacoes" component={UsuarioSolicitacoes} 
+                options={
+                    {
+                        drawerLabel: "Solicitações",
+                        drawerIcon: ({color, size}) => (
+                            <FIcon name="users" size={size} color={color}/>
+                        ),
+                        headerTitle: ""
+                    }
+            }/>
         </Drawer.Navigator>
     )
 }
