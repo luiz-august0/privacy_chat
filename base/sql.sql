@@ -12,7 +12,7 @@ CREATE TABLE usuario_solicitacao(
 CREATE TABLE usuario_contato(
 	Usr_Codigo INT(11) NOT NULL,
 	UsrC_Contato INT(11) NOT NULL,
-	UsrC_Apelido VARCHAR(120) NOT NULL
+	UsrC_Apelido VARCHAR(120)
 );
 
 ALTER TABLE usuario_solicitacao ADD CONSTRAINT fk_usuariosolicitacao

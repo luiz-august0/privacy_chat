@@ -56,6 +56,10 @@ export const postUsuarioContato = async (usuarioID, contato, contatoApelido) => 
     return api.post('/usuario_contato', { usuarioID, contato, contatoApelido });
 };
 
+export const updateContatoApelido = async (usuarioID, contato, contatoApelido) => { 
+    return api.post('/usuario_contato_apelido', { usuarioID, contato, contatoApelido });
+};
+
 export const deleteUsuarioContato = async (usuarioID, contato, contatoApelido) => { 
     return api.post('/usuario_contato_remove', { usuarioID, contato, contatoApelido });
 };

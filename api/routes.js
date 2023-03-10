@@ -23,6 +23,7 @@ routes.post('/usuario_solicitacao', UsuarioContatoController.postSolicitacao);
 routes.post('/usuario_solicitacao_remove', UsuarioContatoController.deleteSolicitacao);
 routes.get('/usuario_contato/:id', UsuarioContatoController.getContatos);
 routes.post('/usuario_contato', UsuarioContatoController.postContato);
+routes.post('/usuario_contato_apelido', UsuarioContatoController.updateContatoApelido);
 routes.post('/usuario_contato_remove', UsuarioContatoController.deleteContato);
 
 export default routes;
