@@ -130,7 +130,7 @@ const UsuarioSolicitacoes = (props) => {
 						{(sendContatoMode && sendMode)?
 						<>
 							<TextInput
-								style={[style.input, { width: '70%' }]}
+								style={[style.input, { width: '70%', marginTop: 20 }]}
 								mode='outlined'
 								activeOutlineColor='#fff'
 								keyboardType='default'
@@ -145,10 +145,10 @@ const UsuarioSolicitacoes = (props) => {
 							<HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.apelido !== null ? true : false}>
 								{errors.apelido}
 							</HelperText>
-							<TouchableOpacity style={[style.button, {backgroundColor: '#05A94E'}]} onPress={() => handleEnviaContato()}>
+							<TouchableOpacity style={[style.button, {backgroundColor: '#515657'}]} onPress={() => handleEnviaContato()}>
 								<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Confirmar</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={[style.button, {backgroundColor: '#E82E2E', marginTop: -10}]} onPress={() => { 
+							<TouchableOpacity style={[style.button, {backgroundColor: '#8a1a1a', marginTop: -10}]} onPress={() => { 
 								setSendContatoMode(false);
 								setErrors(initialStateErrors); 
 								setId(''); 

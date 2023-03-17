@@ -1,29 +1,37 @@
 import 'react-native-gesture-handler';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerItem, DrawerItemList, DrawerContentScrollView } from '@react-navigation/drawer';
 import { AuthProvider } from './src/contexts/auth';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api } from "./src/services/api";
+import MIcon from 'react-native-vector-icons/MaterialIcons';
+import FIcon from 'react-native-vector-icons/FontAwesome';
 import Login from './src/pages/Login/index';
 import Registro from './src/pages/Registro/index';
 import Home from './src/pages/Home/index';
 import EditarSenha from './src/pages/EditarSenha/index';
-import MIcon from 'react-native-vector-icons/MaterialIcons';
-import FIcon from 'react-native-vector-icons/FontAwesome';
 import UsuarioSolicitacoes from './src/pages/UsuarioSolicitacoes';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const DrawerContent = (props) => {
+    const [loadedID, setLoadedID] = useState('');
+
     const logout = async() => {
         await AsyncStorage.removeItem("usuario");
         await AsyncStorage.removeItem("token");
         
         api.defaults.headers.Authorization = null;
     }
+
+    const loadID = async() => { setLoadedID(await AsyncStorage.getItem("usuario"))};
+
+    useEffect(() => {
+        loadID();
+    }, []);
 
     return (
         <DrawerContentScrollView {...props}>
@@ -32,6 +40,9 @@ const DrawerContent = (props) => {
             icon={({color, size}) => <MIcon color={color} size={size} name="logout" />}
             inactiveTintColor='#FFF'
             onPress={() => { logout(); props.navigation.navigate('Login');}}/>
+            <DrawerItem label={`ID: ${loadedID!==''?JSON.parse(loadedID).id:null}`} 
+            icon={({color, size}) => <MIcon color={color} size={size} name="person" />}
+            inactiveTintColor='#FFF'/>
         </DrawerContentScrollView>
     )
 }
