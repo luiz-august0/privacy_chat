@@ -26,5 +26,14 @@ export default StyleSheet.create({
         height: 35,
         borderRadius: 10,
         backgroundColor: '#515657'
-    }
+    },
+    textTitle: {
+        width: '100%',
+        fontSize: 27,
+        fontFamily: 'Montserrat-Bold',
+        textAlign: 'center',
+        color: '#ffff',
+        marginTop: '10%',
+        marginBottom: '5%'
+    },
 });

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView } from 'react-native';
-import { TextInput, HelperText } from "react-native-paper";
+import { Card, TextInput, HelperText } from "react-native-paper";
 import { connect } from 'react-redux';
+import FIcon from 'react-native-vector-icons/FontAwesome';
 import globalStyles from '../../globalStyles';
 import style from '../UsuarioSolicitacoes/style'
 import { 
@@ -92,14 +93,18 @@ const UsuarioSolicitacoes = (props) => {
 	const handleEnviaContato = async() => {
 		try {
 			await postUsuarioContato(props.usuario.state.id, id, apelido);
-			Alert.alert('Solicitação enviada com sucesso!');
+			Alert.alert('Contato adicionado com sucesso!');
 		} catch (error) {
 			Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
 		}
+		
 		setSendContatoMode(false);
 		setSendMode(false);
 		setId('');
 		setApelido('');
+		setSendMode(false);
+		setErrors(initialStateErrors);
+		setId('');
 	}
 
 	return (
@@ -170,6 +175,28 @@ const UsuarioSolicitacoes = (props) => {
 							<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Cancelar</Text>
 						</TouchableOpacity>
 					</>:null}
+					{JSON.stringify(usuarioSolicitacoes)!=='[]'?
+						<>
+							<Text style={style.textTitle}>Solicitações pendentes</Text>
+							{usuarioSolicitacoes.map((e) => {
+								return (
+									<>
+										<Card key={e.Usr_Solicitacao} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+											<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Solicitacao}`}/>
+											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+												<TouchableOpacity style={{padding: 10}}>
+													<FIcon name="check-circle" size={25} color={'#05A94E'}></FIcon>
+												</TouchableOpacity>
+												<TouchableOpacity style={{padding: 10}}>
+													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+												</TouchableOpacity>
+											</View>
+										</Card>
+									</>
+								)
+							})}
+						</>
+					:null}
 				</SafeAreaView>
       		</View>
     	</ScrollView>
