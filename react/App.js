@@ -7,7 +7,8 @@ import {name as appName} from './app.json';
 import storeConfig from './src/store/storeConfig';
 
 let customFonts = {
-    'Montserrat-Bold': require('./src/assets/fonts/Montserrat-Bold.ttf')
+    'Montserrat-Bold': require('./src/assets/fonts/Montserrat-Bold.ttf'),
+    'Montserrat-Regular': require('./src/assets/fonts/Montserrat-Regular.ttf')
 };
 
 const store = storeConfig();

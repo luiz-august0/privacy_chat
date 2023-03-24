@@ -16,9 +16,11 @@ import {
 const UsuarioSolicitacoes = (props) => {
 	const initialStateErrors = {'id': null, 'apelido': null};
 	const [id, setId] = useState('');
+	const [idSolicitacao, setIdSolicitacao] = useState('');
 	const [apelido, setApelido] = useState('');
 	const [sendMode, setSendMode] = useState(false);
 	const [sendContatoMode, setSendContatoMode] = useState(false);
+	const [sendContatoSolicitacao, setSendContatoSolicitacao] = useState(false);
 	const [usuarioSolicitacoes, setUsuarioSolicitacoes] = useState([]);
 	const [usuarioSolicitacoesEnv, setUsuarioSolicitacoesEnv] = useState([]);
 	const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(false);
@@ -47,9 +49,17 @@ const UsuarioSolicitacoes = (props) => {
 		}
 	}
 
-    useEffect(() => {
+	const refreshData = () => {
         getSolicitacoes();
 		getSolicitacoesEnv();
+	}
+
+	setTimeout(() => {
+		refreshData();
+	}, 10000);
+
+    useEffect(() => {
+		refreshData();
     }, []);
 
 	const handleEnviaSolicitacao = async() => {
@@ -72,6 +82,7 @@ const UsuarioSolicitacoes = (props) => {
 				setSendMode(false);
 				setErrors(initialStateErrors);
 				setId('');
+				refreshData();
 			} catch (error) {
 				if (error.message === "Request failed with status code 401") {
 					handleError('ID de usuário informado já consta em suas solicitações enviadas', 'id');
@@ -83,6 +94,8 @@ const UsuarioSolicitacoes = (props) => {
 					handleError('ID de usuário informado ja enviou uma solicitação para você.' + '\n' + 
 								'Digite abaixo um apelido para adicionar este novo contato', 'id');
 					setSendContatoMode(true);
+					setIdSolicitacao('');
+					setSendContatoSolicitacao(false);
 				} else {
 					Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
 				}
@@ -92,19 +105,91 @@ const UsuarioSolicitacoes = (props) => {
 
 	const handleEnviaContato = async() => {
 		try {
-			await postUsuarioContato(props.usuario.state.id, id, apelido);
+			if (idSolicitacao !== null && idSolicitacao !== '') {
+				await postUsuarioContato(props.usuario.state.id, idSolicitacao, apelido);
+			} else {
+				await postUsuarioContato(props.usuario.state.id, id, apelido);
+			}
 			Alert.alert('Contato adicionado com sucesso!');
+			refreshData();
 		} catch (error) {
 			Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
 		}
 		
+		if (sendContatoMode) {
+			setSendContatoMode(false);
+			setId('');
+			setApelido('');
+			setSendMode(false);
+			setErrors(initialStateErrors);
+		} else {
+			setSendContatoSolicitacao(false);
+			setApelido('');
+			setIdSolicitacao('');
+			handleError(null, 'apelido');
+		}
+	}
+
+	const handleCancelarContato = () => {
+		if (sendContatoMode) {
+			setSendContatoMode(false);
+			setErrors(initialStateErrors); 
+			setId(''); 
+			setApelido('');
+		} else {
+			setSendContatoSolicitacao(false);
+			setApelido('');
+			setIdSolicitacao('');
+			handleError(null, 'apelido');
+		}
+	}
+
+	const handleConfirmaSolicitacao = (idParameter) => {
 		setSendContatoMode(false);
-		setSendMode(false);
-		setId('');
 		setApelido('');
-		setSendMode(false);
+		setIdSolicitacao(idParameter);
 		setErrors(initialStateErrors);
-		setId('');
+		handleError(null, 'apelido');
+		setSendContatoSolicitacao(true);
+	}
+
+	const handleDeleteSolicitacao = async(id, idSolicitado) => {
+		try {
+			await deleteUsuarioSolicitacao(id, idSolicitado);
+			Alert.alert('Solicitação excluida com sucesso!');
+			refreshData();
+		} catch (error) {
+			Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+		}
+	}
+
+	const ViewApelido = () => {
+		return (
+			<>
+				<TextInput
+					style={[style.input, { width: '70%', marginTop: 20 }]}
+					mode='outlined'
+					activeOutlineColor='#fff'
+					keyboardType='default'
+					label="Apelido"
+					error={errors.apelido !== null ? true : false}
+					onFocus={() => handleError(null, 'apelido')}
+					theme={{colors: { placeholder: 'white', text: 'white', primary: 'white', error: '#ffff00'}}}
+					left={<TextInput.Icon color="white" style={{ marginTop: '50%' }} name="account" />}
+					value={apelido}
+					onChangeText={(apelido) => setApelido(apelido)}
+				/>
+				<HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.apelido !== null ? true : false}>
+					{errors.apelido}
+				</HelperText>
+				<TouchableOpacity style={[style.button, {backgroundColor: '#05A94E'}]} onPress={() => handleEnviaContato()}>
+					<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Confirmar</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={[style.button, {backgroundColor: '#E82E2E', marginTop: -10}]} onPress={() => handleCancelarContato()}>
+					<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Cancelar</Text>
+				</TouchableOpacity>
+			</>
+		)
 	}
 
 	return (
@@ -132,67 +217,63 @@ const UsuarioSolicitacoes = (props) => {
 						<HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.id !== null ? true : false}>
 							{errors.id}
 						</HelperText>
-						{(sendContatoMode && sendMode)?
+						{!sendContatoMode?
 						<>
-							<TextInput
-								style={[style.input, { width: '70%', marginTop: 20 }]}
-								mode='outlined'
-								activeOutlineColor='#fff'
-								keyboardType='default'
-								label="Apelido"
-								error={errors.apelido !== null ? true : false}
-								onFocus={() => handleError(null, 'apelido')}
-								theme={{colors: { placeholder: 'white', text: 'white', primary: 'white', error: '#ffff00'}}}
-								left={<TextInput.Icon color="white" style={{ marginTop: '50%' }} name="account" />}
-								value={apelido}
-								onChangeText={(apelido) => setApelido(apelido)}
-							/>
-							<HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.apelido !== null ? true : false}>
-								{errors.apelido}
-							</HelperText>
-							<TouchableOpacity style={[style.button, {backgroundColor: '#515657'}]} onPress={() => handleEnviaContato()}>
-								<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Confirmar</Text>
+							<TouchableOpacity style={[style.button, {backgroundColor: '#05A94E'}]} onPress={() => handleEnviaSolicitacao()}>
+							<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Confirmar</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={[style.button, {backgroundColor: '#8a1a1a', marginTop: -10}]} onPress={() => { 
+							<TouchableOpacity style={[style.button, {backgroundColor: '#E82E2E', marginTop: -10}]} onPress={() => { 
 								setSendContatoMode(false);
+								setSendMode(false); 
 								setErrors(initialStateErrors); 
 								setId(''); 
 								setApelido('');
 							}}>
 								<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Cancelar</Text>
 							</TouchableOpacity>
-						</>:null}
-						<TouchableOpacity style={[style.button, {backgroundColor: '#05A94E'}]} onPress={() => handleEnviaSolicitacao()}>
-							<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Confirmar</Text>
-						</TouchableOpacity>
-						<TouchableOpacity style={[style.button, {backgroundColor: '#E82E2E', marginTop: -10}]} onPress={() => { 
-							setSendContatoMode(false);
-							setSendMode(false); 
-							setErrors(initialStateErrors); 
-							setId(''); 
-							setApelido('');
-						}}>
-							<Text style={{ color: "#ffff", fontSize: 14, fontWeight: 'bold' }}>Cancelar</Text>
-						</TouchableOpacity>
+						</>
+						:null}
+						{(sendContatoMode && sendMode)?ViewApelido():null}
 					</>:null}
 					{JSON.stringify(usuarioSolicitacoes)!=='[]'?
 						<>
 							<Text style={style.textTitle}>Solicitações pendentes</Text>
 							{usuarioSolicitacoes.map((e) => {
 								return (
-									<>
-										<Card key={e.Usr_Solicitacao} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
-											<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Solicitacao}`}/>
-											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
-												<TouchableOpacity style={{padding: 10}}>
-													<FIcon name="check-circle" size={25} color={'#05A94E'}></FIcon>
-												</TouchableOpacity>
-												<TouchableOpacity style={{padding: 10}}>
-													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
-												</TouchableOpacity>
-											</View>
-										</Card>
-									</>
+									<Card key={e.Usr_Solicitacao} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+										<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Solicitacao}`}/>
+										{(sendContatoSolicitacao) && (e.Usr_Solicitacao == idSolicitacao)?
+										<View style={{alignItems: 'center'}}>
+											{ViewApelido()}
+										</View>
+										:
+										<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+											<TouchableOpacity style={{padding: 20}} onPress={() => handleConfirmaSolicitacao(e.Usr_Solicitacao)}>
+												<FIcon name="check-circle" size={25} color={'#05A94E'}></FIcon>
+											</TouchableOpacity>
+											<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(props.usuario.state.id, e.Usr_Solicitacao)}>
+												<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+											</TouchableOpacity>
+										</View>
+										}
+									</Card>
+								)
+							})}
+						</>
+					:null}
+					{JSON.stringify(usuarioSolicitacoesEnv)!=='[]'?
+						<>
+							<Text style={style.textTitle}>Solicitações enviadas</Text>
+							{usuarioSolicitacoesEnv.map((e) => {
+								return (
+									<Card key={e.Usr_Codigo} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+										<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Codigo}`}/>
+										<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+											<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(e.Usr_Codigo, props.usuario.state.id)}>
+												<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+											</TouchableOpacity>
+										</View>
+									</Card>
 								)
 							})}
 						</>

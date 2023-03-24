@@ -36,4 +36,21 @@ export default StyleSheet.create({
         marginTop: '10%',
         marginBottom: '5%'
     },
+    textCard: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#ffff',
+        marginLeft: 10
+    },
+    cardView: {
+        flexDirection: 'row', 
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: 300, 
+        height: 60,
+        marginBottom: 10, 
+        borderRadius: 10,
+        backgroundColor: '#262626'
+    }
 });
