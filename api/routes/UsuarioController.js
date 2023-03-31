@@ -167,7 +167,7 @@ class UsuarioController {
                         } else {
                             const email = JSON.stringify(result[0].Usr_Email).slice(0, -1).slice(1 | 1);
                             const key = JSON.stringify(result[0].Email).slice(0, -1).slice(1 | 1);
-                            const link = `http://localhost:3000/${key}`
+                            const link = `https://privacy-chat.vercel.app/${key}`
                             const send = async() => {
                                 if (await sendEmail(email, link, 'RECUPERACAO')) {
                                     return res.status(201).json();
