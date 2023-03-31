@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, View, Alert, Image, ActivityIndicator } from 'react-native';
 import { TextInput, HelperText } from "react-native-paper";
 import globalStyles from '../../globalStyles';
 import style from '../Registro/style'
 import Logo from '../../img/logo.png';
-import { createUsuario } from '../../services/api';
+import { createUsuario, postEnviaEmailRecuperacaoSenha } from '../../services/api';
+import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
 
 const validarEmail = (email) => {
 	var re = /\S+@\S+\.\S+/;
@@ -57,7 +58,7 @@ const Registro = (props) => {
 	}
 
 	return (
-		<ScrollView style={{ backgroundColor: globalStyles.main_color }}>
+		<KeyboardAvoidingWrapper style={{ backgroundColor: globalStyles.main_color }}>
       		<View style={style.container}>
 				<SafeAreaView style={style.safeAreaC}>
 					<Image source={Logo} style={style.LogoImage}/>
@@ -117,8 +118,76 @@ const Registro = (props) => {
 					</TouchableOpacity>
 				</SafeAreaView>
       		</View>
-    	</ScrollView>
+    	</KeyboardAvoidingWrapper>
 	)
 }
+
+const RedefinirSenha = ({ navigation, route }) => {
+	const [email, setEmail] = useState('');
+	const [errors, setErrors] = useState({ 'email': null });
+	const [loading, setLoading] = useState(false);
   
-export default Registro;
+	const handleError = (error, input) => {
+	  	setErrors(prevState => ({ ...prevState, [input]: error }));
+	};
+  
+	const enviaEmail = async() => {
+	  	let isValid = true;
+  
+	  	if (validarEmail(email) === false) {
+			handleError("Email inválido", "email");
+			isValid = false;
+	  	}
+  
+	  if (isValid) {
+		setLoading(true);
+		try {
+		  	await postEnviaEmailRecuperacaoSenha(email);
+		  	Alert.alert('Atenção', 'Email de redefinição de senha enviado com sucesso!');
+		  	navigation.navigate('Login');
+		} catch (error) {
+		  	console.log(error)
+		  	if (error.message === "Request failed with status code 404") {
+				handleError("Email informado não existe cadastro", "email");
+		  	}
+		  	if (error.message === "Request failed with status code 400") {
+				Alert.alert('Erro', 'Não foi possível enviar o e-mail');
+		  	}
+		}
+		setLoading(false);
+	  }
+	}
+  
+	return (
+	  	<KeyboardAvoidingWrapper style={{ backgroundColor: globalStyles.main_color }}>
+			<View style={style.container} >
+				<Text style={{ color: '#fff', marginTop: 120, textAlign: 'center', fontSize: 27, fontWeight: 'bold', }}>Redefinição de senha</Text>
+				<SafeAreaView style={style.safeAreaC}>
+					<TextInput
+					style={style.inputC}
+					mode='outlined'
+					activeOutlineColor='#fff'
+					keyboardType='email-address'
+					label="Email"
+					error={errors.email !== null ? true : false}
+					onFocus={() => handleError(null, 'email')}
+					theme={{ colors: { placeholder: `${email!==''?"white":"gray"}`, text: 'white', primary: 'white', error: '#ffff00' } }}
+					left={<TextInput.Icon color="white" style={{ marginTop: '50%' }} name="email" />}
+					value={email}
+					onChangeText={(email) => setEmail(email)}
+					/>
+					<HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.email !== null ? true : false}>
+					{errors.email}
+					</HelperText>
+					<TouchableOpacity style={[style.btnRedefinir, { backgroundColor: !loading?'#05A94E':'gray' }]} onPress={() => {!loading?enviaEmail():null}}>
+					{!loading?<Text style={{ color: '#fff', fontWeight: 'bold'}}>Enviar</Text>
+					:<ActivityIndicator/>}
+					</TouchableOpacity>
+				</SafeAreaView>
+			</View>
+	  	</KeyboardAvoidingWrapper>
+	)
+}
+
+  
+export { Registro, RedefinirSenha };

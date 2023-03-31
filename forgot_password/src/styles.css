@@ -1,0 +1,77 @@
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0 2rem;
+    background-color: #000;
+}
+#app .p {
+    font-weight: bold;
+}
+
+#app .form{
+    background-color: #fff;
+    width: 100%;
+    max-width: 480px;
+    padding: 4rem;
+    margin-top: 15px;
+    border-radius: 00.5rem;
+    height: 50%;
+    text-align: center;
+    box-shadow: 0px 2px 10px black;
+}
+
+#app .field {
+    padding-bottom: 1.5rem;
+    font-family: unset;
+}
+
+#app .field label {
+    display: block;
+    color:#707070;
+    font-size: 20px;
+    text-align: left;
+}
+
+#app .field input {
+    width: 100%;
+    height: 2rem;
+    font-size: 17px;
+    border-color: rgba(128, 128, 128, 0.225);
+    border-style: groove;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.2s ease;
+    background-color: #404040;
+    color: #fff;
+}
+
+#app .field input:focus {
+    height: 2.1rem;
+    box-shadow: 0px 2px 5px black;
+}
+
+#app .actions {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+#app .actions button {
+    width: 8rem;
+    height: 2.5rem;
+    font-size: 14px;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    background-color: #05A94E;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+#app .actions button:hover {
+    background-color: #396340;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView, Image, ActivityIndicator, Dimensions } from 'react-native'
+import { SafeAreaView, Text, TouchableOpacity, View, Alert, Image, ActivityIndicator, Dimensions } from 'react-native'
 import { TextInput } from "react-native-paper";
 import { connect } from 'react-redux';
 import globalStyles from '../../globalStyles';
@@ -7,6 +7,7 @@ import { usuarioLogado } from '../../store/actions/usuario';
 import style from '../Login/style'
 import Logo from '../../img/logo.png';
 import { Context } from '../../contexts/auth';
+import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
 
 const Login = (props) => {
 	const [senha, setSenha] = useState('');
@@ -47,7 +48,7 @@ const Login = (props) => {
 	}
 
 	return (
-		<ScrollView style={{ backgroundColor: globalStyles.main_color }}>
+		<KeyboardAvoidingWrapper style={{ backgroundColor: globalStyles.main_color }}>
 			{!isLoading?
 			<View style={style.container}>
 				<SafeAreaView style={style.safeAreaL} >
@@ -76,7 +77,7 @@ const Login = (props) => {
 						onChangeText={(senha) => setSenha(senha)}
 					/>
 					<TouchableOpacity
-						onPress={() => Alert.alert('Teste')}
+						onPress={() => props.navigation.navigate('RedefinirSenha')}
 					>
 						<Text style={{ color: "#ffff", marginTop: 10, fontSize: 14, fontWeight: 'bold' }} >Esqueci a Senha</Text>
 					</TouchableOpacity>
@@ -96,7 +97,7 @@ const Login = (props) => {
 				</SafeAreaView>
 			</View>
 			:<ActivityIndicator color="white" style={{marginTop: Dimensions.get('window').height / 2}}/>}
-    	</ScrollView>
+    	</KeyboardAvoidingWrapper>
 	)
 }
 

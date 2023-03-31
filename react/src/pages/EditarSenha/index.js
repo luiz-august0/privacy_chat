@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { ScrollView, View, SafeAreaView, Text, TouchableOpacity, Alert } from "react-native";
+import { View, SafeAreaView, Text, TouchableOpacity, Alert } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import style from "./style";
 import { updateUsuarioPassword } from "../../services/api";
 import globalStyles from "../../globalStyles";
 import { connect } from "react-redux";
+import KeyboardAvoidingWrapper from "../../components/KeyboardAvoidingWrapper";
 
 const EditarSenha = (props) => {
     const [senhaAntiga, setSenhaAntiga] = useState('');
@@ -53,7 +54,7 @@ const EditarSenha = (props) => {
     }
 
     return (
-        <ScrollView style={{ backgroundColor: globalStyles.main_color }}>
+        <KeyboardAvoidingWrapper style={{ backgroundColor: globalStyles.main_color }}>
             <View style={style.containerPassword} >
                 <Text style={style.textTitle}>Alterar senha do usuário</Text>
                 <SafeAreaView style={style.safeArea}>
@@ -113,7 +114,7 @@ const EditarSenha = (props) => {
                     </TouchableOpacity>
                 </SafeAreaView>
             </View>
-        </ScrollView>
+        </KeyboardAvoidingWrapper>
     )
 }
 

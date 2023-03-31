@@ -7,6 +7,8 @@ import UsuarioContatoController from "./routes/UsuarioContatoController";
 const routes = new Router();
 
 routes.post('/usuario', UsuarioController.create);
+routes.post('/usuario_emailrecuperacao', UsuarioController.postEnviaEmailRecuperacaoSenha);
+routes.post('/usuario_recuperacao', UsuarioController.postRecuperacaoSenha);
 routes.put('/sessions', SessionController.create);
 routes.use(auth);
 

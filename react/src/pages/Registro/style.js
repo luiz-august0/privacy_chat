@@ -32,5 +32,14 @@ export default StyleSheet.create({
         height: 35,
         borderRadius: 10,
         backgroundColor: '#515657'
+    },
+    btnRedefinir: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 20,
+        width: 110,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: '#05A94E'
     }
 });

@@ -9,7 +9,7 @@ import { api } from "./src/services/api";
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import FIcon from 'react-native-vector-icons/FontAwesome';
 import Login from './src/pages/Login/index';
-import Registro from './src/pages/Registro/index';
+import { Registro, RedefinirSenha } from './src/pages/Registro/index';
 import Home from './src/pages/Home/index';
 import EditarSenha from './src/pages/EditarSenha/index';
 import UsuarioSolicitacoes from './src/pages/UsuarioSolicitacoes';
@@ -120,6 +120,10 @@ const Routes = () => {
                     <Stack.Screen
                     name="Registro"
                     component={Registro}
+                    />
+                    <Stack.Screen
+                    name="RedefinirSenha"
+                    component={RedefinirSenha}
                     />
                 </Stack.Navigator>
             </NavigationContainer>

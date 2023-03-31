@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: 'http://10.47.0.238:5000'
+    baseURL: 'http://192.168.0.106:5000'
 });
 
 //Rota de sessão
@@ -29,6 +29,10 @@ export const deleteUsuario = async (usuarioID) => {
 
 export const getUsuario = async (usuarioID) => {
     return api.get(`/usuario/${usuarioID}`);
+};
+
+export const postEnviaEmailRecuperacaoSenha = async(email) => {
+    return api.post('/usuario_emailrecuperacao', { email });
 };
 
 //Rotas de usuario contato

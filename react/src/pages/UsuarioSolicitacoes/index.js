@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View, Alert, ScrollView } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { Card, TextInput, HelperText } from "react-native-paper";
 import { connect } from 'react-redux';
 import FIcon from 'react-native-vector-icons/FontAwesome';
@@ -12,6 +12,8 @@ import {
 	postUsuarioContato, 
 	deleteUsuarioSolicitacao 
 } from '../../services/api';
+import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
+import { sleep } from '../../globalFunctions';
 
 const UsuarioSolicitacoes = (props) => {
 	const initialStateErrors = {'id': null, 'apelido': null};
@@ -53,11 +55,7 @@ const UsuarioSolicitacoes = (props) => {
         getSolicitacoes();
 		getSolicitacoesEnv();
 	}
-
-	setTimeout(() => {
-		refreshData();
-	}, 10000);
-
+		
     useEffect(() => {
 		refreshData();
     }, []);
@@ -193,7 +191,7 @@ const UsuarioSolicitacoes = (props) => {
 	}
 
 	return (
-		<ScrollView style={{ backgroundColor: globalStyles.main_color }}>
+		<KeyboardAvoidingWrapper style={{ backgroundColor: globalStyles.main_color }}>
       		<View style={style.container}>
 				<SafeAreaView style={style.safeArea}>
 					<TouchableOpacity style={[style.button, { width: 160 }]} onPress={() => setSendMode(true)}>
@@ -235,6 +233,11 @@ const UsuarioSolicitacoes = (props) => {
 						:null}
 						{(sendContatoMode && sendMode)?ViewApelido():null}
 					</>:null}
+					<View style={{ width: 250, marginTop: 20 }}>
+						<TouchableOpacity style={{ left: '100%' }} onPress={() => refreshData()}>
+							<FIcon name="repeat" size={25} color={'#05A94E'}></FIcon>
+						</TouchableOpacity>
+					</View>
 					{JSON.stringify(usuarioSolicitacoes)!=='[]'?
 						<>
 							<Text style={style.textTitle}>Solicitações pendentes</Text>
@@ -280,7 +283,7 @@ const UsuarioSolicitacoes = (props) => {
 					:null}
 				</SafeAreaView>
       		</View>
-    	</ScrollView>
+    	</KeyboardAvoidingWrapper>
 	)
 }
   
