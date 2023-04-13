@@ -52,5 +52,9 @@ export default StyleSheet.create({
         marginBottom: 10, 
         borderRadius: 10,
         backgroundColor: '#262626'
+    },
+    cardText: {
+        color: '#ffff', 
+        fontSize: 18
     }
 });

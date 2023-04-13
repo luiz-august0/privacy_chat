@@ -89,7 +89,7 @@ const HomeNav = () => {
             <Drawer.Screen name="UsuarioSolicitacoes" component={UsuarioSolicitacoes} 
                 options={
                     {
-                        drawerLabel: "Solicitações",
+                        drawerLabel: "Contatos",
                         drawerIcon: ({color, size}) => (
                             <FIcon name="users" size={size} color={color}/>
                         ),

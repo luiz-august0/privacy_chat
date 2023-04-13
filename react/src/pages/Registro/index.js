@@ -45,13 +45,13 @@ const Registro = (props) => {
 		if (isValid) {
 			try {
 				await createUsuario(email, senha);
-				Alert.alert('Usuário cadastrado com sucesso!');
+				Alert.alert('Atenção', 'Usuário cadastrado com sucesso!');
 				props.navigation.navigate('Login');
 			} catch (error) {
 				if (error.message === "Request failed with status code 400") {
 					handleError('Email já cadastrado', 'email');
 				} else {
-					Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+					Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
 				}
 			}
 		}

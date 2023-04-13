@@ -8,6 +8,7 @@ import style from '../Login/style'
 import Logo from '../../img/logo.png';
 import { Context } from '../../contexts/auth';
 import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = (props) => {
 	const [senha, setSenha] = useState('');
@@ -18,33 +19,46 @@ const Login = (props) => {
 	const { login, loadUser } = useContext(Context);
 
 	useEffect(() => {
-		setIsLoading(true);
-		loadUser().then((resolve) => {
-			const data = resolve.dataUsuario;
-		  	if (resolve.authenticated) {
-				props.onLogin(data);
-				props.navigation.navigate('HomeNav', { screen: 'Home' });
-		  	}
-		});
-		setIsLoading(false);
+		const onCreate = async() => {
+			const usuario = await AsyncStorage.getItem("usuario");
+			const token = await AsyncStorage.getItem("token");
+	
+			if (usuario && token) {
+				setIsLoading(true);
+				await loadUser().then((resolve) => {
+					const data = resolve.dataUsuario;
+					  if (resolve.authenticated) {
+						props.onLogin(data);
+						props.navigation.navigate('HomeNav', { screen: 'Home' });
+					  }
+				});
+				setIsLoading(false);
+			}
+		}
+
+		onCreate();
 	}, []);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (email === '' && senha === '') {
-			Alert.alert('Email e senha deve ser informado');
+			Alert.alert('Atenção', 'Email e senha deve ser informado');
 		  	return;
 		}
-	
-		setIsLoading(true);
-		login(email, senha).then((resolve) => {
-		 	const data = resolve.dataUsuario;
-		  	if (resolve.authenticated) {
-				props.onLogin(data);
-				props.navigation.navigate('HomeNav', { screen: 'Home' });
-		  	}
-		});
-		setIsLoading(false);
+
+		const doLogin = async() => {
+			setIsLoading(true);
+			await login(email, senha).then((resolve) => {
+				 const data = resolve.dataUsuario;
+				  if (resolve.authenticated) {
+					props.onLogin(data);
+					props.navigation.navigate('HomeNav', { screen: 'Home' });
+				  }
+			});
+			setIsLoading(false);
+		}
+
+		doLogin();
 	}
 
 	return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
 import { Card, TextInput, HelperText } from "react-native-paper";
+import { useIsFocused } from "@react-navigation/native";
 import { connect } from 'react-redux';
 import FIcon from 'react-native-vector-icons/FontAwesome';
 import globalStyles from '../../globalStyles';
@@ -10,12 +11,13 @@ import {
 	getUsuarioSolicitacoesEnviadas, 
 	postUsuarioSolicitacao,  
 	postUsuarioContato, 
-	deleteUsuarioSolicitacao 
+	deleteUsuarioSolicitacao, 
+	getUsuarioContato
 } from '../../services/api';
 import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
-import { sleep } from '../../globalFunctions';
 
 const UsuarioSolicitacoes = (props) => {
+	const isFocused = useIsFocused();
 	const initialStateErrors = {'id': null, 'apelido': null};
 	const [id, setId] = useState('');
 	const [idSolicitacao, setIdSolicitacao] = useState('');
@@ -25,8 +27,8 @@ const UsuarioSolicitacoes = (props) => {
 	const [sendContatoSolicitacao, setSendContatoSolicitacao] = useState(false);
 	const [usuarioSolicitacoes, setUsuarioSolicitacoes] = useState([]);
 	const [usuarioSolicitacoesEnv, setUsuarioSolicitacoesEnv] = useState([]);
-	const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(false);
-	const [loadginSolicitacoesEnv, setLoadingSolicitacoesEnv] = useState(false);
+	const [contatos, setContatos] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState(initialStateErrors);
 
 	const handleError = (error, input) => {
@@ -38,7 +40,7 @@ const UsuarioSolicitacoes = (props) => {
 			const response = await getUsuarioSolicitacoes(props.usuario.state.id);
 			setUsuarioSolicitacoes(response.data);
 		} catch (error) {
-			Alert.alert('Ops!. Ocorreu algum ao carregar suas solicitações, contate o suporte');
+			Alert.alert('Atenção', 'Ops!. Ocorreu algum ao carregar suas solicitações, contate o suporte');
 		}
 	}
 
@@ -47,18 +49,35 @@ const UsuarioSolicitacoes = (props) => {
 			const response = await getUsuarioSolicitacoesEnviadas(props.usuario.state.id);
 			setUsuarioSolicitacoesEnv(response.data);
 		} catch (error) {
-			Alert.alert('Ops!. Ocorreu algum ao carregar suas solicitações enviadas, contate o suporte');
+			Alert.alert('Atenção', 'Ops!. Ocorreu algum ao carregar suas solicitações enviadas, contate o suporte');
+		}
+	}
+
+	const getContatos = async() => {
+		try {			
+			const response = await getUsuarioContato(props.usuario.state.id);
+			setContatos(response.data);
+		} catch (error) {
+			Alert.alert('Atenção', 'Ops!. Ocorreu algum ao carregar seus contatos, contate o suporte');
 		}
 	}
 
 	const refreshData = () => {
-        getSolicitacoes();
-		getSolicitacoesEnv();
+		const refresh = async() => { 
+			setLoading(true);
+			await getSolicitacoes(); 
+			await getSolicitacoesEnv(); 
+			await getContatos();
+			setLoading(false);
+		}
+		refresh();
 	}
 		
     useEffect(() => {
-		refreshData();
-    }, []);
+		if(isFocused) { 
+			refreshData();
+		}
+    }, [props, isFocused]);
 
 	const handleEnviaSolicitacao = async() => {
 		let isValid = true;
@@ -76,7 +95,7 @@ const UsuarioSolicitacoes = (props) => {
 		if (isValid) {
 			try {
 				await postUsuarioSolicitacao(id, props.usuario.state.id);
-				Alert.alert('Solicitação enviada com sucesso!');
+				Alert.alert('Atenção', 'Solicitação enviada com sucesso!');
 				setSendMode(false);
 				setErrors(initialStateErrors);
 				setId('');
@@ -95,7 +114,7 @@ const UsuarioSolicitacoes = (props) => {
 					setIdSolicitacao('');
 					setSendContatoSolicitacao(false);
 				} else {
-					Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+					Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
 				}
 			}
 		}
@@ -108,10 +127,10 @@ const UsuarioSolicitacoes = (props) => {
 			} else {
 				await postUsuarioContato(props.usuario.state.id, id, apelido);
 			}
-			Alert.alert('Contato adicionado com sucesso!');
+			Alert.alert('Atenção', 'Contato adicionado com sucesso!');
 			refreshData();
 		} catch (error) {
-			Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+			Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
 		}
 		
 		if (sendContatoMode) {
@@ -151,14 +170,24 @@ const UsuarioSolicitacoes = (props) => {
 		setSendContatoSolicitacao(true);
 	}
 
-	const handleDeleteSolicitacao = async(id, idSolicitado) => {
-		try {
-			await deleteUsuarioSolicitacao(id, idSolicitado);
-			Alert.alert('Solicitação excluida com sucesso!');
-			refreshData();
-		} catch (error) {
-			Alert.alert('Ops!. Ocorreu algum erro de servidor, contate o suporte');
+	const handleDeleteSolicitacao = (id, idSolicitado) => {
+		const deleteRegister = async() => {
+			try {
+				await deleteUsuarioSolicitacao(id, idSolicitado);
+				Alert.alert('Atenção', 'Solicitação excluida com sucesso!');
+				refreshData();
+			} catch (error) {
+				Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
+			}
 		}
+
+		Alert.alert('Confirmação', 'Deseja realmente excluir ?',
+            [
+                {text: 'Não', style: 'cancel'},
+                {text: 'Sim', onPress: () => deleteRegister()},
+            ],
+            { cancelable: true }
+        );
 	}
 
 	const ViewApelido = () => {
@@ -233,55 +262,89 @@ const UsuarioSolicitacoes = (props) => {
 						:null}
 						{(sendContatoMode && sendMode)?ViewApelido():null}
 					</>:null}
-					<View style={{ width: 250, marginTop: 20 }}>
-						<TouchableOpacity style={{ left: '100%' }} onPress={() => refreshData()}>
-							<FIcon name="repeat" size={25} color={'#05A94E'}></FIcon>
-						</TouchableOpacity>
-					</View>
-					{JSON.stringify(usuarioSolicitacoes)!=='[]'?
-						<>
-							<Text style={style.textTitle}>Solicitações pendentes</Text>
-							{usuarioSolicitacoes.map((e) => {
-								return (
-									<Card key={e.Usr_Solicitacao} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
-										<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Solicitacao}`}/>
-										{(sendContatoSolicitacao) && (e.Usr_Solicitacao == idSolicitacao)?
-										<View style={{alignItems: 'center'}}>
-											{ViewApelido()}
-										</View>
-										:
-										<View style={{flexDirection: 'row', justifyContent: 'center'}}>
-											<TouchableOpacity style={{padding: 20}} onPress={() => handleConfirmaSolicitacao(e.Usr_Solicitacao)}>
-												<FIcon name="check-circle" size={25} color={'#05A94E'}></FIcon>
-											</TouchableOpacity>
-											<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(props.usuario.state.id, e.Usr_Solicitacao)}>
-												<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
-											</TouchableOpacity>
-										</View>
-										}
-									</Card>
-								)
-							})}
-						</>
-					:null}
-					{JSON.stringify(usuarioSolicitacoesEnv)!=='[]'?
-						<>
-							<Text style={style.textTitle}>Solicitações enviadas</Text>
-							{usuarioSolicitacoesEnv.map((e) => {
-								return (
-									<Card key={e.Usr_Codigo} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
-										<Card.Title titleStyle={{color: '#ffff'}} title={`Usuário ID: ${e.Usr_Codigo}`}/>
-										<View style={{flexDirection: 'row', justifyContent: 'center'}}>
-											<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(e.Usr_Codigo, props.usuario.state.id)}>
-												<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
-											</TouchableOpacity>
-										</View>
-									</Card>
-								)
-							})}
-						</>
-					:null}
-				</SafeAreaView>
+					{!loading?
+					<>
+						<View style={{ width: 250, marginTop: 20 }}>
+							<TouchableOpacity style={{ left: '100%' }} onPress={() => refreshData()}>
+								<FIcon name="repeat" size={25} color={'#05A94E'}></FIcon>
+							</TouchableOpacity>
+						</View>
+						{JSON.stringify(contatos)!=='[]'?
+							<>
+								<Text style={style.textTitle}>Contatos</Text>
+								{contatos.map((e) => {
+									return (
+										<Card key={e.UsrC_Contato} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+											<Card.Title 
+											titleStyle={style.cardText} 
+											subtitleStyle={style.cardText}
+											title={`Usuário ID: ${e.UsrC_Contato}`}
+											subtitle={e.UsrC_Apelido !== null && e.UsrC_Apelido !== ''?`Apelido: ${e.UsrC_Apelido}`:null}
+											/>
+											{(sendContatoSolicitacao) && (e.UsrC_Contato == idSolicitacao)?
+											<View style={{alignItems: 'center'}}>
+												{ViewApelido()}
+											</View>
+											:
+											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleConfirmaSolicitacao(e.UsrC_Contato)}>
+													<FIcon name="edit" size={25} color={'yellow'}></FIcon>
+												</TouchableOpacity>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(props.usuario.state.id, e.UsrC_Contato)}>
+													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+												</TouchableOpacity>
+											</View>
+											}
+										</Card>
+									)
+								})}
+							</>
+						:null}
+						{JSON.stringify(usuarioSolicitacoes)!=='[]'?
+							<>
+								<Text style={style.textTitle}>Solicitações pendentes</Text>
+								{usuarioSolicitacoes.map((e) => {
+									return (
+										<Card key={e.Usr_Solicitacao} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+											<Card.Title titleStyle={style.cardText} title={`Usuário ID: ${e.Usr_Solicitacao}`}/>
+											{(sendContatoSolicitacao) && (e.Usr_Solicitacao == idSolicitacao)?
+											<View style={{alignItems: 'center'}}>
+												{ViewApelido()}
+											</View>
+											:
+											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleConfirmaSolicitacao(e.Usr_Solicitacao)}>
+													<FIcon name="check-circle" size={25} color={'#05A94E'}></FIcon>
+												</TouchableOpacity>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(props.usuario.state.id, e.Usr_Solicitacao)}>
+													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+												</TouchableOpacity>
+											</View>
+											}
+										</Card>
+									)
+								})}
+							</>
+						:null}
+						{JSON.stringify(usuarioSolicitacoesEnv)!=='[]'?
+							<>
+								<Text style={style.textTitle}>Solicitações enviadas</Text>
+								{usuarioSolicitacoesEnv.map((e) => {
+									return (
+										<Card key={e.Usr_Codigo} style={{width: 300, marginBottom: 10, backgroundColor: '#262626'}}>
+											<Card.Title titleStyle={style.cardText} title={`Usuário ID: ${e.Usr_Codigo}`}/>
+											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(e.Usr_Codigo, props.usuario.state.id)}>
+													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
+												</TouchableOpacity>
+											</View>
+										</Card>
+									)
+								})}
+							</>
+						:null}
+					</>:<ActivityIndicator style={{ marginTop: 20 }}/>}
+					</SafeAreaView>
       		</View>
     	</KeyboardAvoidingWrapper>
 	)
