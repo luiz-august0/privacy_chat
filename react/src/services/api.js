@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: 'http://192.168.0.106:5000'
+    baseURL: 'http://10.47.7.248:5000'
 });
 
 //Rota de sessão
@@ -64,6 +64,6 @@ export const updateContatoApelido = async (usuarioID, contato, contatoApelido) =
     return api.post('/usuario_contato_apelido', { usuarioID, contato, contatoApelido });
 };
 
-export const deleteUsuarioContato = async (usuarioID, contato, contatoApelido) => { 
-    return api.post('/usuario_contato_remove', { usuarioID, contato, contatoApelido });
+export const deleteUsuarioContato = async (usuarioID, contato) => { 
+    return api.post('/usuario_contato_remove', { usuarioID, contato });
 };

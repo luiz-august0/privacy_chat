@@ -12,7 +12,9 @@ import {
 	postUsuarioSolicitacao,  
 	postUsuarioContato, 
 	deleteUsuarioSolicitacao, 
-	getUsuarioContato
+	getUsuarioContato,
+	deleteUsuarioContato,
+	updateContatoApelido
 } from '../../services/api';
 import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper';
 
@@ -24,6 +26,7 @@ const UsuarioSolicitacoes = (props) => {
 	const [apelido, setApelido] = useState('');
 	const [sendMode, setSendMode] = useState(false);
 	const [sendContatoMode, setSendContatoMode] = useState(false);
+	const [updateContatoMode, setUpdateContatoMode] = useState(false);
 	const [sendContatoSolicitacao, setSendContatoSolicitacao] = useState(false);
 	const [usuarioSolicitacoes, setUsuarioSolicitacoes] = useState([]);
 	const [usuarioSolicitacoesEnv, setUsuarioSolicitacoesEnv] = useState([]);
@@ -110,6 +113,8 @@ const UsuarioSolicitacoes = (props) => {
 				} else if (error.message === "Request failed with status code 400") {
 					handleError('ID de usuário informado ja enviou uma solicitação para você.' + '\n' + 
 								'Digite abaixo um apelido para adicionar este novo contato', 'id');
+					setApelido('');
+					setUpdateContatoMode(false);
 					setSendContatoMode(true);
 					setIdSolicitacao('');
 					setSendContatoSolicitacao(false);
@@ -121,16 +126,26 @@ const UsuarioSolicitacoes = (props) => {
 	}
 
 	const handleEnviaContato = async() => {
-		try {
-			if (idSolicitacao !== null && idSolicitacao !== '') {
-				await postUsuarioContato(props.usuario.state.id, idSolicitacao, apelido);
-			} else {
-				await postUsuarioContato(props.usuario.state.id, id, apelido);
+		if (!updateContatoMode) {
+			try {
+				if (idSolicitacao !== null && idSolicitacao !== '') {
+					await postUsuarioContato(props.usuario.state.id, idSolicitacao, apelido);
+				} else {
+					await postUsuarioContato(props.usuario.state.id, id, apelido);
+				}
+				Alert.alert('Atenção', 'Contato adicionado com sucesso!');
+				refreshData();
+			} catch (error) {
+				Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
 			}
-			Alert.alert('Atenção', 'Contato adicionado com sucesso!');
-			refreshData();
-		} catch (error) {
-			Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
+		} else {
+			try {
+				await updateContatoApelido(props.usuario.state.id, idSolicitacao, apelido);
+				Alert.alert('Atenção', 'Apelido atualizado com sucesso!');
+				refreshData();
+			} catch (error) {
+				Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
+			}
 		}
 		
 		if (sendContatoMode) {
@@ -141,6 +156,7 @@ const UsuarioSolicitacoes = (props) => {
 			setErrors(initialStateErrors);
 		} else {
 			setSendContatoSolicitacao(false);
+			setUpdateContatoMode(false);
 			setApelido('');
 			setIdSolicitacao('');
 			handleError(null, 'apelido');
@@ -155,6 +171,7 @@ const UsuarioSolicitacoes = (props) => {
 			setApelido('');
 		} else {
 			setSendContatoSolicitacao(false);
+			setUpdateContatoMode(false);
 			setApelido('');
 			setIdSolicitacao('');
 			handleError(null, 'apelido');
@@ -175,6 +192,26 @@ const UsuarioSolicitacoes = (props) => {
 			try {
 				await deleteUsuarioSolicitacao(id, idSolicitado);
 				Alert.alert('Atenção', 'Solicitação excluida com sucesso!');
+				refreshData();
+			} catch (error) {
+				Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
+			}
+		}
+
+		Alert.alert('Confirmação', 'Deseja realmente excluir ?',
+            [
+                {text: 'Não', style: 'cancel'},
+                {text: 'Sim', onPress: () => deleteRegister()},
+            ],
+            { cancelable: true }
+        );
+	}
+
+	const handleDeleteContato = (id, idSolicitado) => {
+		const deleteRegister = async() => {
+			try {
+				await deleteUsuarioContato(id, idSolicitado);
+				Alert.alert('Atenção', 'Contato excluido com sucesso!');
 				refreshData();
 			} catch (error) {
 				Alert.alert('Atenção', 'Ops!. Ocorreu algum erro de servidor, contate o suporte');
@@ -287,10 +324,17 @@ const UsuarioSolicitacoes = (props) => {
 											</View>
 											:
 											<View style={{flexDirection: 'row', justifyContent: 'center'}}>
-												<TouchableOpacity style={{padding: 20}} onPress={() => handleConfirmaSolicitacao(e.UsrC_Contato)}>
+												<TouchableOpacity style={{padding: 20}} onPress={() => 
+												{ 
+													handleConfirmaSolicitacao(e.UsrC_Contato); 
+													setUpdateContatoMode(true); 
+													if(e.UsrC_Apelido !== null && e.UsrC_Apelido !== '') { 
+														setApelido(e.UsrC_Apelido) 
+													}
+												}}>
 													<FIcon name="edit" size={25} color={'yellow'}></FIcon>
 												</TouchableOpacity>
-												<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteSolicitacao(props.usuario.state.id, e.UsrC_Contato)}>
+												<TouchableOpacity style={{padding: 20}} onPress={() => handleDeleteContato(props.usuario.state.id, e.UsrC_Contato)}>
 													<FIcon name="trash" size={25} color={'#E82E2E'}></FIcon>
 												</TouchableOpacity>
 											</View>
