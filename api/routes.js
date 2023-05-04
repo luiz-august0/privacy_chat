@@ -3,6 +3,7 @@ import SessionController from "./routes/SessionController";
 import auth from "./middlewares/auth";
 import UsuarioController from "./routes/UsuarioController";
 import UsuarioContatoController from "./routes/UsuarioContatoController";
+import UsuarioChatsController from "./routes/UsuarioChatsController";
 
 const routes = new Router();
 
@@ -27,5 +28,11 @@ routes.get('/usuario_contato/:id', UsuarioContatoController.getContatos);
 routes.post('/usuario_contato', UsuarioContatoController.postContato);
 routes.post('/usuario_contato_apelido', UsuarioContatoController.updateContatoApelido);
 routes.post('/usuario_contato_remove', UsuarioContatoController.deleteContato);
+
+//Rotas usuario chats
+routes.get('/usuario_chat_contatos/:id', UsuarioChatsController.getContatosChats);
+routes.get('/usuario_chat/:id', UsuarioChatsController.getChats);
+routes.post('/usuario_chat', UsuarioChatsController.postChat);
+routes.post('/usuario_chat_remove', UsuarioChatsController.deleteChat);
 
 export default routes;

@@ -15,6 +15,11 @@ CREATE TABLE usuario_contato(
 	UsrC_Apelido VARCHAR(120)
 );
 
+CREATE TABLE usuario_chats (
+	Usr_Codigo INT(11) NOT NULL,
+	Usr_Chat INT(11) NOT NULL
+);
+
 ALTER TABLE usuario_solicitacao ADD CONSTRAINT fk_usuariosolicitacao
 FOREIGN KEY (Usr_Codigo) REFERENCES usuario (Usr_Codigo);
 
@@ -32,3 +37,12 @@ FOREIGN KEY (UsrC_Contato) REFERENCES usuario (Usr_Codigo);
 
 ALTER TABLE usuario_contato ADD CONSTRAINT pk_usuario_contato
 PRIMARY KEY (Usr_Codigo, UsrC_Contato);
+
+ALTER TABLE usuario_chats ADD CONSTRAINT fk_usuariochat
+FOREIGN KEY (Usr_Codigo) REFERENCES usuario (Usr_Codigo);
+
+ALTER TABLE usuario_chats ADD CONSTRAINT fk_usuariochat_chat
+FOREIGN KEY (Usr_Chat) REFERENCES usuario (Usr_Codigo);
+
+ALTER TABLE usuario_chats ADD CONSTRAINT pk_usuario_chat
+PRIMARY KEY (Usr_Codigo, Usr_Chat);
