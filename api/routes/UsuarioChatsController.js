@@ -74,6 +74,13 @@ class UsuarioChatsController {
                                             `INSERT INTO usuario_chats VALUES(${usuarioID}, ${contatoID})`,
                                             (error, result, fields) => {
                                                 if (error) { return res.status(500).send({ error: error }) }
+                                            }
+                                        )
+
+                                        conn.query(
+                                            `INSERT INTO usuario_chats VALUES(${contatoID}, ${usuarioID})`,
+                                            (error, result, fields) => {
+                                                if (error) { return res.status(500).send({ error: error }) }
                                                 return res.status(201).json(result);
                                             }
                                         )
@@ -101,10 +108,9 @@ class UsuarioChatsController {
         try {
             mysql.getConnection((error, conn) => {
                 conn.query(
-                    `DELETE FROM usuario_chats WHERE Usr_Codigo = ${usuarioID} AND Usr_Chat = ${contatoID}`,
+                    `DELETE FROM usuario_chats WHERE (Usr_Codigo = ${usuarioID} AND Usr_Chat = ${contatoID}) OR (Usr_Codigo = ${contatoID} AND Usr_Chat = ${usuarioID}) `,
                     (error, result, fields) => {
                         if (error) { return res.status(500).send({ error: error }) }
-
 						return res.status(201).json(result);
                     }
                 )

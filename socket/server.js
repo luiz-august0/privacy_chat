@@ -5,16 +5,16 @@ const io = require('socket.io')(http);
 let users = [];
 
 const addUser = (userID, socketID) => {
-    !users.some(user=>user.userID === userID) &&
+    !users.some(user=>user.userID === userID.toString()) &&
         users.push({ userID, socketID });
 }
 
 const removeUser = (socketID) => {
-    users = users.filter((user) => user.socketID !== socketID);
+    users = users.filter((user) => user.socketID !== socketID.toString());
 }
 
 const getUser = (userID) => {
-    return users.find(user=>user.userID === userID);
+    return users.find((user) => user.userID === userID.toString());
 }
 
 io.on('connection', (socket) => {
@@ -27,10 +27,12 @@ io.on('connection', (socket) => {
 
     socket.on("sendMessage", ({ senderID, receiverID, text }) => {
         const user = getUser(receiverID);
-        io.emit(user.socketID).emit("getMessage", {
-            senderID,
-            text
-        })
+        if (user !== undefined) {
+            io.to(user.socketID).emit("getMessage", {
+                senderID,
+                text
+            })
+        }
     })
 
     socket.on("disconnect", () => {

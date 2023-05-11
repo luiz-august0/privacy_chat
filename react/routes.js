@@ -13,6 +13,7 @@ import { Registro, RedefinirSenha } from './src/pages/Registro/index';
 import Home from './src/pages/Home/index';
 import EditarSenha from './src/pages/EditarSenha/index';
 import UsuarioSolicitacoes from './src/pages/UsuarioSolicitacoes';
+import Chat from './src/pages/Chat';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -112,6 +113,10 @@ const Routes = () => {
                     <Stack.Screen
                     name="HomeNav"
                     component={HomeNav}
+                    />
+                    <Stack.Screen
+                    name="Chat"
+                    component={Chat}
                     />
                     <Stack.Screen
                     name="Login"

@@ -28,7 +28,7 @@ const Home = (props) => {
 
 	const RenderItem = ({idChat, apelido}) => {
         return (
-            <TouchableOpacity key={idChat} style={{flexDirection: 'row', padding: 10, justifyContent: 'space-between'}}>
+            <TouchableOpacity key={idChat} style={{flexDirection: 'row', padding: 10, justifyContent: 'space-between'}} onPress={() => props.navigation.navigate("Chat", { contatoID: idChat, apelido: apelido })}>
 				<View>
 					<Text style={style.text}>{`Usuário ID: ${idChat}`}</Text>
 					{apelido !== null && apelido !== ''?
