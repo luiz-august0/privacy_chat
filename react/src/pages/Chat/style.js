@@ -7,7 +7,7 @@ export default StyleSheet.create({
         backgroundColor: globalStyles.main_color
     }, 
 	header: {
-		fontSize: 22,
+		fontSize: 16,
 		textAlign: 'center',
 		fontFamily: 'Montserrat-Bold',
 		color: '#fff',

@@ -4,6 +4,7 @@ import auth from "./middlewares/auth";
 import UsuarioController from "./routes/UsuarioController";
 import UsuarioContatoController from "./routes/UsuarioContatoController";
 import UsuarioChatsController from "./routes/UsuarioChatsController";
+import ChatController from "./routes/ChatController";
 
 const routes = new Router();
 
@@ -34,5 +35,9 @@ routes.get('/usuario_chat_contatos/:id', UsuarioChatsController.getContatosChats
 routes.get('/usuario_chat/:id', UsuarioChatsController.getChats);
 routes.post('/usuario_chat', UsuarioChatsController.postChat);
 routes.post('/usuario_chat_remove', UsuarioChatsController.deleteChat);
+
+//Rotas CHAT
+routes.post('/chat_mensagens_get', ChatController.getMensagens);
+routes.post('/chat_mensagens_post', ChatController.postMensagem);
 
 export default routes;

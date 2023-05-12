@@ -5,16 +5,16 @@ const io = require('socket.io')(http);
 let users = [];
 
 const addUser = (userID, socketID) => {
-    !users.some(user=>user.userID === userID.toString()) &&
+    !users.some(user=>user.userID === userID) &&
         users.push({ userID, socketID });
 }
 
 const removeUser = (socketID) => {
-    users = users.filter((user) => user.socketID !== socketID.toString());
+    users = users.filter((user) => user.socketID !== socketID);
 }
 
 const getUser = (userID) => {
-    return users.find((user) => user.userID === userID.toString());
+    return users.find((user) => user.userID === userID);
 }
 
 io.on('connection', (socket) => {

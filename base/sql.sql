@@ -20,6 +20,13 @@ CREATE TABLE usuario_chats (
 	Usr_Chat INT(11) NOT NULL
 );
 
+CREATE TABLE chats (
+	Sender_Id INT(11) NOT NULL,
+	Receiver_Id INT(11) NOT NULL,
+	Mensagem BLOB NOT NULL,
+	Data DATETIME NOT NULL
+);
+
 ALTER TABLE usuario_solicitacao ADD CONSTRAINT fk_usuariosolicitacao
 FOREIGN KEY (Usr_Codigo) REFERENCES usuario (Usr_Codigo);
 
@@ -46,3 +53,9 @@ FOREIGN KEY (Usr_Chat) REFERENCES usuario (Usr_Codigo);
 
 ALTER TABLE usuario_chats ADD CONSTRAINT pk_usuario_chat
 PRIMARY KEY (Usr_Codigo, Usr_Chat);
+
+ALTER TABLE chats ADD CONSTRAINT fk_usuario_sender
+FOREIGN KEY (Sender_Id) REFERENCES usuario (Usr_Codigo);
+
+ALTER TABLE chats ADD CONSTRAINT fk_usuario_receiver
+FOREIGN KEY (Receiver_Id) REFERENCES usuario (Usr_Codigo);

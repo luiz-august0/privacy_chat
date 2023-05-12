@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL: 'http://192.168.0.109:5000'
+    baseURL: 'http://10.47.4.164:5000'
 });
 
 //Rota de sessão
@@ -83,4 +83,13 @@ export const postChat = async (usuarioID, contatoID) => {
 
 export const removeChat = async (usuarioID, contatoID) => { 
     return api.post('/usuario_chat_remove', { usuarioID, contatoID });
+};
+
+//Rotas CHAT
+export const getMensagens = async (senderID, receiverID) => {
+    return api.post('/chat_mensagens_get', { senderID, receiverID });
+};
+
+export const postMensagem = async (senderID, receiverID, mensagem, data) => {
+    return api.post('/chat_mensagens_post', { senderID, receiverID, mensagem, data });
 };
