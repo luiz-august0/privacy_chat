@@ -27,13 +27,14 @@ export default StyleSheet.create({
 	},
 	input: {
 		flex: 1,
+		marginLeft: 8,
 		marginRight: 8,
 		padding: 8,
 		borderWidth: 1,
 		borderColor: '#ccc',
 		borderRadius: 4,
 		color: '#000',
-		backgroundColor: '#fff',
+		backgroundColor: '#fff'
 	},
 	button: {
 		padding: 8,

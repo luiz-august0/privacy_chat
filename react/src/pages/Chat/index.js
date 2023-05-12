@@ -6,9 +6,10 @@ import style from './style';
 import IIcon from 'react-native-vector-icons/Ionicons';
 import moment from "moment";
 import 'moment/locale/pt-br'
+import * as ImagePicker from 'expo-image-picker';
 import { getMensagens, postMensagem } from '../../services/api';
 
-const socket = io('http://10.47.4.164:6000');
+const socket = io('http://192.168.0.109:6000');
 
 const Chat = (props) => {
 	const [message, setMessage] = useState('');
@@ -21,11 +22,49 @@ const Chat = (props) => {
 		let mensagens = [];
 
 		data.map((e) => {
-			mensagens.push({message: e.Mensagem, sender: e.Sender_Id, receiver: e.Receiver_Id, createdAt: e.Data.toString()})
+			mensagens.push({message: e.Mensagem, sender: e.Sender_Id, receiver: e.Receiver_Id, createdAt: moment(e.Data.toString()).format('YYYY/MM/DD HH:mm:ss')})
 		})
 
 		setMessages(mensagens);
 	}
+
+	const pickImage = async () => {
+        let res = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            base64: true,
+            aspect: [4, 3],
+            quality: 1,
+        })
+        
+        if (!res.cancelled) {
+            
+
+
+        }   
+    }
+
+    const pickCamera = async () => {
+        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+          Alert.alert("Atenção", "Você recusou este app para acessar sua câmera!");
+          return;
+        }
+
+        let res = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            base64: true,
+            aspect: [4, 3],
+            quality: 1,
+        })
+        
+        if (!res.cancelled) {
+            
+
+        }
+    }
 
 	useEffect(() => {
 		moment.locale('pt-br')
@@ -58,7 +97,8 @@ const Chat = (props) => {
 			});
 			setMessages((prev) => [...prev, {message: message, sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
 			setMessage('');
-			await postMensagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), message, moment(Date.now()).format('YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss"))
+
+			await postMensagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), message, moment().format('YYYY-MM-DD HH:mm:ss'))
 		}
 	};
 
@@ -84,10 +124,17 @@ const Chat = (props) => {
 				))}
 				</ScrollView>
 				<View style={style.inputContainer}>
+					<TouchableOpacity onPress={pickCamera}>
+						<IIcon name="camera" size={25} color={'#007bff'}></IIcon>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={pickImage} style={{marginLeft: 8}}>
+						<IIcon name="image-outline" size={25} color={'#007bff'}></IIcon>
+					</TouchableOpacity>
 					<TextInput
 					style={style.input}
 					placeholder="Digite uma mensagem..."
 					value={message}
+					multiline={true}
 					onChangeText={(text) => setMessage(text)}
 					/>
 					<TouchableOpacity onPress={sendMessage}>
