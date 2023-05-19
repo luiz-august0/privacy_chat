@@ -50,5 +50,11 @@ export default StyleSheet.create({
 		padding: 10,
 		borderRadius: 10,
 		marginBottom: 10
+	},
+	viewImage: {
+		width: 250,
+		height: 250,
+		borderRadius: 10, 
+		marginBottom: 10
 	}
 });

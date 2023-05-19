@@ -7,7 +7,7 @@ class ChatController {
         try {
             mysql.getConnection((error, conn) => {
                 conn.query(
-                    `SELECT Sender_Id, Receiver_Id, CONVERT(Mensagem USING utf8) AS Mensagem, Data FROM chats
+                    `SELECT Sender_Id, Receiver_Id, CONVERT(Mensagem USING utf8) AS Mensagem, Tipo, Data FROM chats
                      WHERE (Sender_Id = ${senderID} AND Receiver_Id = ${receiverID})
                      OR (Sender_Id = ${receiverID} AND Receiver_Id = ${senderID})`,
                     (error, result, fields) => {
@@ -24,12 +24,12 @@ class ChatController {
     }
 
     async postMensagem(req, res) {
-        const { senderID, receiverID, mensagem, data } = req.body;
+        const { senderID, receiverID, mensagem, tipo, data } = req.body;
 
         try {
             mysql.getConnection((error, conn) => {
                 conn.query(
-                    `INSERT INTO chats VALUES(${senderID}, ${receiverID}, "${mensagem}", "${data}")`,
+                    `INSERT INTO chats VALUES(${senderID}, ${receiverID}, "${mensagem}", "${tipo}", "${data}")`,
                     (error, result, fields) => {
                         if (error) { console.log(error); return res.status(500).send({ error: error }) }
 						return res.status(201).json(result);
@@ -40,6 +40,20 @@ class ChatController {
         } catch(err) {
             console.error(err);
             return res.status(500).json({ error: "Internal server error." })
+        }
+    }
+
+    async postMensagemImagem(senderID, receiverID, mensagem, data) {
+        try {
+            mysql.getConnection((error, conn) => {
+                conn.query(
+                    `INSERT INTO chats VALUES(${senderID}, ${receiverID}, "${mensagem}", "image", "${data}")`
+                )
+                conn.release();
+            });
+
+        } catch (err) {
+            console.error(err);
         }
     }
 

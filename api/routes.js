@@ -5,6 +5,7 @@ import UsuarioController from "./routes/UsuarioController";
 import UsuarioContatoController from "./routes/UsuarioContatoController";
 import UsuarioChatsController from "./routes/UsuarioChatsController";
 import ChatController from "./routes/ChatController";
+import uploadFile from "./uploadFile";
 
 const routes = new Router();
 
@@ -39,5 +40,17 @@ routes.post('/usuario_chat_remove', UsuarioChatsController.deleteChat);
 //Rotas CHAT
 routes.post('/chat_mensagens_get', ChatController.getMensagens);
 routes.post('/chat_mensagens_post', ChatController.postMensagem);
+routes.post('/chat_mensagens_postImage', (req, res) => {
+	uploadFile(req.body.file)
+		.then((url) => {
+			try {
+				ChatController.postMensagemImagem(req.body.senderID, req.body.receiverID, url, req.body.data);
+				return res.status(201).json(url);
+			} catch (err) {
+				res.status(500).json(err);
+			}
+		})
+		.catch((err) => res.status(500).json(err));
+});
 
 export default routes;

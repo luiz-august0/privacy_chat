@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 import style from './style';
@@ -7,14 +7,15 @@ import IIcon from 'react-native-vector-icons/Ionicons';
 import moment from "moment";
 import 'moment/locale/pt-br'
 import * as ImagePicker from 'expo-image-picker';
-import { getMensagens, postMensagem } from '../../services/api';
+import { getMensagens, postMensagem, postMensagemImagem } from '../../services/api';
 
-const socket = io('http://192.168.0.109:6000');
+const socket = io('http://10.47.1.56:6000');
 
 const Chat = (props) => {
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState([]);
-	const scrollViewRef = useRef();
+	const [isSendingImage, setIsSendingImage] = useState(false);
+	const scrollViewRef = useRef();;
 
 	const handleGetMensagens = async() => {
 		const res = await getMensagens(props.usuario.state.id.toString(), props.route.params?.contatoID.toString());
@@ -22,7 +23,20 @@ const Chat = (props) => {
 		let mensagens = [];
 
 		data.map((e) => {
-			mensagens.push({message: e.Mensagem, sender: e.Sender_Id, receiver: e.Receiver_Id, createdAt: moment(e.Data.toString()).format('YYYY/MM/DD HH:mm:ss')})
+			let message = '';
+
+			switch (e.Tipo.toString()) {
+				case 'text':
+					message = e.Mensagem;
+					break;
+				case 'image':
+					message = `https://res.cloudinary.com/dvwxrpftt/image/upload/${e.Mensagem}`;
+					break;
+				default:
+					break;
+			}
+
+			mensagens.push({message: message, type: e.Tipo, sender: e.Sender_Id, receiver: e.Receiver_Id, createdAt: moment(e.Data.toString()).format('YYYY/MM/DD HH:mm:ss')})
 		})
 
 		setMessages(mensagens);
@@ -37,11 +51,24 @@ const Chat = (props) => {
             quality: 1,
         })
         
-        if (!res.cancelled) {
-            
+		if (!res.cancelled) {
+            const encodedBase64 = `data:${res.type}/jpeg;base64,${res.base64}`;
 
-
-        }   
+			try {
+				setIsSendingImage(true);
+                const responseImage = await postMensagemImagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), encodedBase64, moment().format('YYYY-MM-DD HH:mm:ss'))
+				setIsSendingImage(false);
+				setMessages((prev) => [...prev, {message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`, type: 'image', sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
+				socket.emit('sendMessage', {
+					senderID: props.usuario.state.id.toString(),
+					receiverID: props.route.params?.contatoID.toString(),
+					message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`,
+					type: 'image'
+				});
+			} catch (error) {
+                Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem.' )
+            }
+        }
     }
 
     const pickCamera = async () => {
@@ -61,8 +88,22 @@ const Chat = (props) => {
         })
         
         if (!res.cancelled) {
-            
+            const encodedBase64 = `data:${res.type}/jpeg;base64,${res.base64}`;
 
+			try {
+				setIsSendingImage(true);
+                const responseImage = await postMensagemImagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), encodedBase64, moment().format('YYYY-MM-DD HH:mm:ss'))
+				setIsSendingImage(false);
+				setMessages((prev) => [...prev, {message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`, type: 'image', sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
+				socket.emit('sendMessage', {
+					senderID: props.usuario.state.id.toString(),
+					receiverID: props.route.params?.contatoID.toString(),
+					message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`,
+					type: 'image'
+				});
+			} catch (error) {
+                Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem.' )
+            }
         }
     }
 
@@ -77,7 +118,7 @@ const Chat = (props) => {
 		
 		socket.on('getMessage', data => {
 			if (data.senderID.toString() == props.route.params?.contatoID.toString()) {
-				setMessages((prev) => [...prev, {message: data.text, sender: data.senderID, receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
+				setMessages((prev) => [...prev, {message: data.message, type: data.type, sender: data.senderID, receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
 			}
 		})
 	
@@ -88,19 +129,47 @@ const Chat = (props) => {
 		};
 	}, []);
 
-	const sendMessage = async() => {
+	const sendMessage = async(type) => {
 		if (message.trim() !== '') {
 			socket.emit('sendMessage', {
 				senderID: props.usuario.state.id.toString(),
 				receiverID: props.route.params?.contatoID.toString(),
-				text: message
+				message: message,
+				type: type
 			});
-			setMessages((prev) => [...prev, {message: message, sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
+			setMessages((prev) => [...prev, {message: message, type: type, sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
 			setMessage('');
 
-			await postMensagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), message, moment().format('YYYY-MM-DD HH:mm:ss'))
+			await postMensagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), message, type, moment().format('YYYY-MM-DD HH:mm:ss'))
 		}
 	};
+
+	const renderMessage = (type, message, sender, createdAt) => {
+		switch (type) {
+			case 'text':
+				return (
+					<View style={[style.viewMessage, { backgroundColor: sender.toString() !== props.usuario.state.id.toString()?'#313637':'#325C57' }]}>
+						<Text style={style.message}>
+							{message}
+						</Text>
+						<Text style={[style.message, { fontSize: 12, color: '#b3b3b3', textAlign: 'right'}]}>
+							{moment(createdAt).fromNow()}
+						</Text>
+					</View>
+				)
+			case 'image':
+				return(
+					<View style={[style.viewMessage, { backgroundColor: sender.toString() !== props.usuario.state.id.toString()?'#313637':'#325C57', padding: 5}]}>
+						<Image style={style.viewImage} source={{uri: message}}/>
+						<Text style={[style.message, { fontSize: 12, color: '#b3b3b3', textAlign: 'right'}]}>
+							{moment(createdAt).fromNow()}
+						</Text>
+					</View>
+				)
+			default:
+				break;
+		}
+	}
 
 	return (
 		<KeyboardAvoidingView style={style.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -112,16 +181,12 @@ const Chat = (props) => {
 				<ScrollView style={style.messagesContainer} ref={scrollViewRef} onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
 				{messages.map((e, index) => (
 					<View key={index} style={{alignItems: e.sender.toString() !== props.usuario.state.id.toString()?'flex-start':'flex-end', paddingRight: 5}}>
-						<View style={[style.viewMessage, { backgroundColor: e.sender.toString() !== props.usuario.state.id.toString()?'#313637':'#325C57' }]}>
-							<Text style={style.message}>
-								{e.message}
-							</Text>
-							<Text style={[style.message, { fontSize: 12, color: '#b3b3b3', textAlign: 'right'}]}>
-								{moment(e.createdAt).fromNow()}
-							</Text>
-						</View>
+						{renderMessage(e.type, e.message, e.sender, e.createdAt)}
 					</View>
 				))}
+				{isSendingImage?
+				<ActivityIndicator style={{alignItems: 'flex-end', paddingRight: 5}}/>
+				:null}
 				</ScrollView>
 				<View style={style.inputContainer}>
 					<TouchableOpacity onPress={pickCamera}>
@@ -137,7 +202,7 @@ const Chat = (props) => {
 					multiline={true}
 					onChangeText={(text) => setMessage(text)}
 					/>
-					<TouchableOpacity onPress={sendMessage}>
+					<TouchableOpacity onPress={() => sendMessage('text')}>
 						<IIcon name="send-outline" size={25} color={'#007bff'}></IIcon>
 					</TouchableOpacity>
 				</View>

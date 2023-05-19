@@ -25,12 +25,13 @@ io.on('connection', (socket) => {
         io.emit("getUsers", users);
     });
 
-    socket.on("sendMessage", ({ senderID, receiverID, text }) => {
+    socket.on("sendMessage", ({ senderID, receiverID, message, type }) => {
         const user = getUser(receiverID);
         if (user !== undefined) {
             io.to(user.socketID).emit("getMessage", {
                 senderID,
-                text
+                message, 
+                type
             })
         }
     })
