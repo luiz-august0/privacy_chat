@@ -7,7 +7,7 @@ class ChatController {
         try {
             mysql.getConnection((error, conn) => {
                 conn.query(
-                    `SELECT Sender_Id, Receiver_Id, CONVERT(Mensagem USING utf8) AS Mensagem, Tipo, Data FROM chats
+                    `SELECT Sender_Id, Receiver_Id, Mensagem, Tipo, Data FROM chats
                      WHERE (Sender_Id = ${senderID} AND Receiver_Id = ${receiverID})
                      OR (Sender_Id = ${receiverID} AND Receiver_Id = ${senderID})`,
                     (error, result, fields) => {

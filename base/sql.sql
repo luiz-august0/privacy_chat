@@ -23,7 +23,7 @@ CREATE TABLE usuario_chats (
 CREATE TABLE chats (
 	Sender_Id INT(11) NOT NULL,
 	Receiver_Id INT(11) NOT NULL,
-	Mensagem LONGBLOB NOT NULL,
+	Mensagem LONGTEXT NOT NULL,
 	Tipo VARCHAR(255) NOT NULL,
 	Data DATETIME NOT NULL
 );

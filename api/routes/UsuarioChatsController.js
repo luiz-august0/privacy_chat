@@ -7,7 +7,7 @@ class UsuarioChatsController {
         try {
             mysql.getConnection((error, conn) => {
                 conn.query(
-                    `SELECT tmp.Usr_Codigo, tmp.UsrC_Contato, tmp.UsrC_Apelido FROM  (
+                    `SELECT max(tmp.Usr_Codigo) as Usr_Codigo, tmp.UsrC_Contato, max(tmp.UsrC_Apelido) as UsrC_Apelido FROM  (
 					 SELECT Usr_Codigo, UsrC_Contato, UsrC_Apelido FROM usuario_contato WHERE Usr_Codigo = ${id}
 					 UNION ALL
 					 SELECT Usr_Codigo, Usr_Chat AS UsrC_Contato, NULL AS UsrC_Apelido FROM usuario_chats WHERE Usr_Codigo = ${id}

@@ -89,7 +89,7 @@ const EditarSenha = (props) => {
                     value={senha}
                     onChangeText={(senha) => setSenha(senha)}
                     />
-                    <HelperText HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.senha !== null ? true : false}>
+                    <HelperText style={{ color: 'yellow', marginBottom: '-4%' }} type="error" visible={errors.senha !== null ? true : false}>
                         {errors.senha}
                     </HelperText>
                     <TextInput

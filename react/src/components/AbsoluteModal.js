@@ -11,15 +11,15 @@ const AbsoluteModal = ({children, modalVisible, width, handlePressOut}) => {
         >
             <View style={style.centeredView}>
                 <View style={[style.modalView, { width: width }]}>
-                <TouchableOpacity style={{position: "absolute", right: "110%", padding: 10}} onPress={() => handlePressOut()}>
-                    <OIcon 
-                    name="x" 
-                    size={30} 
-                    color={'gray'}
-                    />
-                </TouchableOpacity>
-                    <View style={{marginBottom: 30}} />
-                    {children}
+                    <TouchableOpacity style={{position: "absolute", right: "110%", padding: 10}} onPress={() => handlePressOut()}>
+                        <OIcon 
+                            name="x" 
+                            size={30} 
+                            color={'gray'}
+                        />
+                    </TouchableOpacity>
+                        <View style={{marginBottom: 30}} />
+                        {children}
                 </View>
             </View>
         </Modal>
@@ -34,6 +34,7 @@ const style = StyleSheet.create({
         marginTop: 22,
     },
     modalView: {
+        maxHeight: '100%',
         margin: 20,
         backgroundColor: '#262626',
         borderRadius: 20,

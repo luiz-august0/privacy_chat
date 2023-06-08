@@ -9,7 +9,7 @@ import 'moment/locale/pt-br'
 import * as ImagePicker from 'expo-image-picker';
 import { getMensagens, postMensagem, postMensagemImagem } from '../../services/api';
 
-const socket = io('http://10.47.1.56:6000');
+const socket = io('http://192.168.0.109:6000');
 
 const Chat = (props) => {
 	const [message, setMessage] = useState('');
@@ -54,10 +54,9 @@ const Chat = (props) => {
 		if (!res.cancelled) {
             const encodedBase64 = `data:${res.type}/jpeg;base64,${res.base64}`;
 
+			setIsSendingImage(true);
 			try {
-				setIsSendingImage(true);
                 const responseImage = await postMensagemImagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), encodedBase64, moment().format('YYYY-MM-DD HH:mm:ss'))
-				setIsSendingImage(false);
 				setMessages((prev) => [...prev, {message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`, type: 'image', sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
 				socket.emit('sendMessage', {
 					senderID: props.usuario.state.id.toString(),
@@ -66,8 +65,9 @@ const Chat = (props) => {
 					type: 'image'
 				});
 			} catch (error) {
-                Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem.' )
+				Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem.' )
             }
+			setIsSendingImage(false);
         }
     }
 
@@ -90,10 +90,9 @@ const Chat = (props) => {
         if (!res.cancelled) {
             const encodedBase64 = `data:${res.type}/jpeg;base64,${res.base64}`;
 
+			setIsSendingImage(true);
 			try {
-				setIsSendingImage(true);
                 const responseImage = await postMensagemImagem(props.usuario.state.id.toString(), props.route.params?.contatoID.toString(), encodedBase64, moment().format('YYYY-MM-DD HH:mm:ss'))
-				setIsSendingImage(false);
 				setMessages((prev) => [...prev, {message: `https://res.cloudinary.com/dvwxrpftt/image/upload/${responseImage.data}`, type: 'image', sender: props.usuario.state.id.toString(), receiver: props.route.params?.contatoID.toString(), createdAt: Date.now()}]);
 				socket.emit('sendMessage', {
 					senderID: props.usuario.state.id.toString(),
@@ -102,8 +101,9 @@ const Chat = (props) => {
 					type: 'image'
 				});
 			} catch (error) {
-                Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem.' )
+                Alert.alert('Atenção', 'Ops!, ocorreu algum erro ao realizar o envio da imagem' )
             }
+			setIsSendingImage(false);
         }
     }
 
