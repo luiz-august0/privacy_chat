@@ -9,7 +9,7 @@ import 'moment/locale/pt-br'
 import * as ImagePicker from 'expo-image-picker';
 import { getMensagens, postMensagem, postMensagemImagem } from '../../services/api';
 
-const socket = io('http://192.168.0.109:6000');
+const socket = io('http://10.47.5.172:6000');
 
 const Chat = (props) => {
 	const [message, setMessage] = useState('');
